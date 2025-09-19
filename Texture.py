@@ -1,3 +1,5 @@
+# NoiseTexture: procedural texture using Perlin noise
+from Perlin import Perlin
 import math
 from Vec3 import Color
 from Rtw_image import RtwImage
@@ -57,3 +59,14 @@ class ImageTexture(Texture):
         pixel = self.image.pixel_data(i, j)
         color_scale = 1.0 / 255.0
         return Color(color_scale * pixel[0], color_scale * pixel[1], color_scale * pixel[2])
+
+class NoiseTexture(Texture):
+    def __init__(self, scale=1.0):
+        self.noise = Perlin()
+        self.scale = scale
+
+    def value(self, u, v, p):
+        # Marble-like pattern: sin(scale * p.z() + 10 * turbulence)
+        t = self.noise.turb(p, 7)
+        marble = math.sin(self.scale * p.z() + 10 * t)
+        return Color(0.5, 0.5, 0.5) * (1 + marble)
