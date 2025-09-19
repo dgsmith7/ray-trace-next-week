@@ -73,6 +73,7 @@ def main():
     cam.defocus_angle = 0.6
     cam.focus_dist = 10.0
 
+
     starttime = datetime.datetime.now()
     print("Started rendering at: ", starttime)
     f = open_new_image_file()

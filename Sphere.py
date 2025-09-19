@@ -9,14 +9,15 @@ from Aabb import Aabb
 
 
 class Sphere(Hittable):
-    #@staticmethod
-    # def get_sphere_uv(p):
-    #     # p: a point on the unit sphere, returns (u, v) in [0,1]x[0,1]
-    #     theta = math.acos(-p.y())
-    #     phi = math.atan2(-p.z(), p.x()) + math.pi
-    #     u = phi / (2 * math.pi)
-    #     v = theta / math.pi
-    #     return u, v
+    @staticmethod
+    def get_sphere_uv(p):
+        # p: a point on the unit sphere, returns (u, v) in [0,1]x[0,1]
+        theta = math.acos(-p.y())
+        phi = math.atan2(-p.z(), p.x()) + math.pi
+        u = phi / (2 * math.pi)
+        v = theta / math.pi
+        return u, v
+    
     def __init__(self, center1: Point3, radius: float, mat: Material, center2: Point3 = None):
         # If center2 is None, stationary sphere. Otherwise, moving sphere.
         self.center1 = center1
@@ -68,7 +69,7 @@ class Sphere(Hittable):
         rec.p = r.at(rec.t)
         outward_normal = (rec.p - sphere_center) / self.radius
         rec.set_face_normal(r, outward_normal)
-        #rec.u, rec.v = self.get_sphere_uv(outward_normal)
+        rec.u, rec.v = self.get_sphere_uv(outward_normal)
         rec.mat = self.mat
 
         return True

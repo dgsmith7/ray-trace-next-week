@@ -39,4 +39,6 @@ class HittableList(Hittable):
                 rec.normal = temp_rec.normal
                 rec.front_face = temp_rec.front_face
                 rec.mat = temp_rec.mat
+                rec.u = temp_rec.u
+                rec.v = temp_rec.v
         return hit_anything
