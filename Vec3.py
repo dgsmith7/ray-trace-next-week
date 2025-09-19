@@ -2,6 +2,11 @@ import math
 import random
 
 class Vec3:
+    def unit(self):
+        len = self.length()
+        if len == 0:
+            return Vec3(0, 0, 0)
+        return self / len
     @staticmethod
     def random_int(min_val, max_val):
         # Returns a random integer in [min_val, max_val]

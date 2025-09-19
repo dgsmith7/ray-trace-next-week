@@ -1,15 +1,18 @@
 from Ray import Ray
 from Vec3 import Vec3, Color
+from Texture import Texture, SolidColor
 import math
 import random
 
 class Material:
     def scatter(self, ray_in, hit_record):
-        raise NotImplementedError("Subclasses must implement this method")
+        # By default, materials do not scatter
+        return False, None, None
+
+    def emitted(self, u, v, p):
+        # By default, materials do not emit light
+        return Color(0, 0, 0)
     
-
-from Texture import Texture, SolidColor
-
 class Lambertian(Material):
     def __init__(self, albedo_or_texture):
         # Accepts either a Color or a Texture
@@ -60,8 +63,47 @@ class Dielectric(Material):
         scattered = Ray(hit_record.p, direction, ray_in.time())
         return True, scattered, attenuation
 
+
     def reflectance(self, cosine, ref_idx):
         # Use Schlick's approximation for reflectance.
         r0 = (1 - ref_idx) / (1 + ref_idx)
         r0 = r0 * r0
         return r0 + (1 - r0) * pow((1 - cosine), 5)
+
+
+# DiffuseLight material for emissive surfaces
+class DiffuseLight(Material):
+    def __init__(self, tex_or_color):
+        # Accepts either a Texture or a Color
+        if isinstance(tex_or_color, Texture):
+            self.tex = tex_or_color
+        else:
+            self.tex = SolidColor(tex_or_color)
+
+    def emitted(self, u, v, p):
+        return self.tex.value(u, v, p)
+    
+class DiffuseLight(Material):
+    def __init__(self, tex_or_color):
+        # Accepts either a Texture or a Color
+        if isinstance(tex_or_color, Texture):
+            self.tex = tex_or_color
+        else:
+            self.tex = SolidColor(tex_or_color)
+
+    def emitted(self, u, v, p):
+        return self.tex.value(u, v, p)
+
+class Isotropic(Material):
+    def __init__(self, tex_or_color):
+        if isinstance(tex_or_color, Texture):
+            self.tex = tex_or_color
+        else:
+            self.tex = SolidColor(tex_or_color)
+
+    def scatter(self, ray_in, hit_record):
+        scatter_direction = Vec3.random_unit_vector()
+        scattered = Ray(hit_record.p, scatter_direction, ray_in.time())
+        attenuation = self.tex.value(hit_record.u, hit_record.v, hit_record.p)
+        return True, scattered, attenuation
+

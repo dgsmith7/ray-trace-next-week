@@ -20,6 +20,7 @@ class Camera:
     self.vup = Vec3(0, 1, 0)
     self.defocus_angle = 0.0
     self.focus_dist = 10.0
+    self.background = Color(0.12, 0.12, 0.12)  # Default background color
 
   def render(self, file, world):
     start = datetime.datetime.now()
@@ -47,19 +48,18 @@ class Camera:
 
   def ray_color(self, r, depth, world):
     # If we've exceeded the ray bounce limit, no more light is gathered.
-    if (depth <= 0):
-      return Color(0.0,0.0,0.0)
+    if depth <= 0:
+      return Color(0.0, 0.0, 0.0)
     rec = HitRecord()
-    if (world.hit(r, Interval(0.001, float('inf')), rec)): 
+    if world.hit(r, Interval(0.001, float('inf')), rec):
+      color_from_emission = rec.mat.emitted(rec.u, rec.v, rec.p)
       hit, scattered, attenuation = rec.mat.scatter(r, rec)
-      if hit:
-        return attenuation * self.ray_color(scattered, depth - 1, world)
-      return Color(0.0,0.0,0.0)  # Black if ray doesn't scatter
-    unit_direction = Vec3.unit_vector(r.direction())
-    a = 0.5 * (unit_direction.y() + 1.0)
-    #return (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0)
-    #return (1.0 - a) * Color(0.12, 0.12, 0.12) + a * Color(0.0, 0.2, 0.5)
-    return (1.0 - a) * Color(0.12, 0.12, 0.12) + a * Color(0.5, 0.7, 1.0)
+      if not hit:
+        return color_from_emission
+      color_from_scatter = attenuation * self.ray_color(scattered, depth - 1, world)
+      return color_from_emission + color_from_scatter
+    # If the ray hits nothing, return the background color.
+    return self.background
 
   def get_ray(self, i, j):
     # Construct a camera ray originating from the defocus disk and directed at a randomly
