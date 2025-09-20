@@ -15,6 +15,7 @@ from Texture import ImageTexture
 from Material import DiffuseLight
 from Quad import box
 from ConstantMedium import ConstantMedium
+from Texture import ImageTexture, NoiseTexture
 
 filename = "finalScene.ppm"
 
@@ -69,8 +70,8 @@ def main():
     world.add(ConstantMedium(boundary2, 0.0001, Color(1, 1, 1)))
 
     # Earth texture sphere
-    from Texture import ImageTexture, NoiseTexture
-    emat = Lambertian(ImageTexture("earthmap.jpg"))
+    earth_texture = ImageTexture("/Users/dgsmith7/Documents/Education/Software Engineering/Fall 2025/Directed Study/ray-trace-next-week/RTW_IMAGES/earthmap.jpg")
+    emat = Lambertian(earth_texture)
     world.add(Sphere(Point3(400, 200, 400), 100, emat))
 
     # Perlin noise sphere
@@ -91,9 +92,9 @@ def main():
 
     cam = Camera()
     cam.aspect_ratio = 1.0
-    cam.image_width = 800
-    cam.samples_per_pixel = 10000
-    cam.max_depth = 40
+    cam.image_width = 400#800
+    cam.samples_per_pixel = 250#10000
+    cam.max_depth = 4#40
     cam.background = Vec3(0, 0, 0)
     cam.vfov = 40
     cam.lookfrom = Point3(278, 278, -600)
